@@ -1,0 +1,36 @@
+//@version=4
+strategy(title="JhonJhon Buy&Sell EMA X", shorttitle="JJ B&S EMAX", overlay=true, initial_capital=1000, process_orders_on_close=false, default_qty_type=strategy.percent_of_equity, default_qty_value=100)
+
+//Inputs
+inputEMALenA = input(defval=8, title="EMA A Length", type=input.integer)
+
+//Strategies
+emaA = ema(close, inputEMALenA)
+
+plot(emaA, title="EMA A", color=#4287f5, linewidth=1)
+
+
+////////////////////////////////////////////////////////////////////////////////
+// From Date Inputs
+fromDay = input(defval = 1, title = "From Day", minval = 1, maxval = 31)
+fromMonth = input(defval = 1, title = "From Month", minval = 1, maxval = 12)
+fromYear = input(defval = 2017, title = "From Year", minval = 1970)
+
+// To Date Inputs
+toDay = input(defval = 31, title = "To Day", minval = 1, maxval = 31)
+toMonth = input(defval = 12, title = "To Month", minval = 1, maxval = 12)
+toYear = input(defval = 2025, title = "To Year", minval = 1970)
+
+// Calculate start/end date and time condition
+startDate = timestamp(fromYear, fromMonth, fromDay, 00, 00)
+finishDate = timestamp(toYear, toMonth, toDay, 00, 00)
+time_cond = time >= startDate and time <= finishDate
+////////////////////////////////////////////////////////////////////////////////
+
+
+//Conditions
+shouldBuy = crossover(close, emaA) and strategy.position_size == 0
+shouldSell = crossunder(close, emaA) and strategy.position_size > 0
+
+strategy.entry(id="Long", long=true, limit=close, when=shouldBuy)
+strategy.exit(id="Long", limit=close, when=shouldSell)
