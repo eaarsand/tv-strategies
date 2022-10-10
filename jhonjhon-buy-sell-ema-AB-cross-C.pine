@@ -1,13 +1,19 @@
 //@version=4
-strategy(title="JhonJhon Buy&Sell EMA X", shorttitle="JJ B&S EMAX", overlay=true, initial_capital=1000, process_orders_on_close=false, default_qty_type=strategy.percent_of_equity, default_qty_value=100)
+strategy(title="JhonJhon Buy&Sell EMA AB Cross C", shorttitle="JJ B&S EMA AB X C", overlay=true, initial_capital=1000, process_orders_on_close=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100)
 
 //Inputs
-inputEMALenA = input(defval=8, title="EMA A Length", type=input.integer)
+inputEMALenA = input(defval=13, title="EMA A Length", type=input.integer)
+inputEMALenB = input(defval=21, title="EMA B Length", type=input.integer)
+inputEMALenC = input(defval=50, title="EMA C Length", type=input.integer)
 
 //Strategies
 emaA = ema(close, inputEMALenA)
+emaB = ema(close, inputEMALenB)
+emaC = ema(close, inputEMALenC)
 
 plot(emaA, title="EMA A", color=#4287f5, linewidth=1)
+plot(emaB, title="EMA B", color=#123fc7, linewidth=2)
+plot(emaC, title="EMA C", color=#bababa, linewidth=3)
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -29,8 +35,8 @@ time_cond = time >= startDate and time <= finishDate
 
 
 //Conditions
-shouldBuy = crossover(close, emaA) and strategy.position_size == 0
-shouldSell = crossunder(close, emaA) and strategy.position_size > 0
+shouldBuy = emaA > emaC and emaB > emaC and strategy.position_size == 0
+shouldSell = emaA < emaC and emaB < emaC and strategy.position_size > 0
 
 strategy.entry(id="Long", long=true, limit=close, when=shouldBuy, comment="Compra")
 strategy.exit(id="Long", limit=close, when=shouldSell, comment="Venda")
